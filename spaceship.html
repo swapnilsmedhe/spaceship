@@ -2,39 +2,12 @@
 
 <head>
   <title>Spaceship</title>
-  <style>
-    #spaceship {
-      height: 50px;
-      width: 50px;
-      background-color: blue;
-    }
-
-    #space {
-      height: 100%;
-    }
-  </style>
-
-  <script>
-
-    const moveSpaceship = (spaceship, event) => {
-      spaceship.style.setProperty('top', event.clientY);
-      spaceship.style.setProperty('left', event.clientX);
-    }
-
-    const main = () => {
-      const space = document.getElementById('space');
-      const spaceship = document.getElementById('spaceship');
-      space.addEventListener('mousemove', () =>
-        moveSpaceship(spaceship, event));
-    };
-
-    window.onload = main;
-  </script>
+  <link rel="stylesheet" href="styles.css">
+  <script src="spaceship.js"></script>
 </head>
 
 <body>
   <div id="space">
-    <div id="spaceship" style="position: absolute;"></div>
   </div>
 </body>
 
