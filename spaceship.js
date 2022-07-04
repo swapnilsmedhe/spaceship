@@ -3,13 +3,13 @@
     #id;
     #position;
     #displacement;
-    #bullets;
+    missiles;
 
-    constructor(id, position, displacement, bullets) {
+    constructor(id, position, displacement, missiles) {
       this.#id = id;
       this.#position = position;
       this.#displacement = displacement;
-      this.#bullets = bullets;
+      this.missiles = missiles;
     }
 
     move(direction) {
@@ -21,9 +21,9 @@
       }
     }
 
-    fireBullet() {
+    launchMissile() {
       const { x, y } = this.#position;
-      this.#bullets.addBullet({ x, y });
+      this.missiles.addMissile({ x, y });
     }
 
     getInfo() {
@@ -32,7 +32,7 @@
     }
   }
 
-  class Bullet {
+  class Missile {
     #id;
     #position;
     #displacement;
@@ -54,29 +54,29 @@
     }
   }
 
-  class Bullets {
-    #bullets;
+  class Missiles {
+    #missiles;
 
     constructor() {
-      this.#bullets = [];
+      this.#missiles = [];
     }
 
-    #getBulletId() {
-      const bulletNumber = this.#bullets.length + 1;
-      return 'bullet' + bulletNumber;
+    #getMissileId() {
+      const missileNumber = this.#missiles.length + 1;
+      return 'missile' + missileNumber;
     }
 
-    addBullet(position) {
-      const bulletId = this.#getBulletId();
-      this.#bullets.push(new Bullet(bulletId, position, { dx: 0, dy: 5 }));
+    addMissile(position) {
+      const missileId = this.#getMissileId();
+      this.#missiles.push(new Missile(missileId, position, { dx: 0, dy: 5 }));
     }
 
-    getLastBullet() {
-      return this.#bullets[this.#bullets.length - 1];
+    getLastMissile() {
+      return this.#missiles[this.#missiles.length - 1];
     }
 
-    getBullets() {
-      return this.#bullets;
+    getMissiles() {
+      return this.#missiles;
     }
   }
 
@@ -84,6 +84,7 @@
     const { id, position } = spaceship.getInfo();
 
     const spaceshipElement = document.createElement('div');
+
     spaceshipElement.id = id;
     spaceshipElement.className = 'spaceship';
     spaceshipElement.style.top = position.y;
@@ -95,12 +96,12 @@
   const positionSpaceship = (spaceship) => {
     const { id, position } = spaceship.getInfo();
     const spaceshipElement = document.getElementById(id);
+
     spaceshipElement.style.top = position.y;
     spaceshipElement.style.left = position.x;
   };
 
   const mapCodeToDirection = (code) => {
-    console.log(code);
     const keyCodes = {
       'ArrowRight': 'right',
       'ArrowLeft': 'left'
@@ -116,28 +117,30 @@
     spaceship.move(direction);
   };
 
-  const initBullet = (bullet, spaceElement) => {
-    const { id, position } = bullet.getInfo();
-    const bulletElement = document.createElement('div');
-    bulletElement.id = id;
-    bulletElement.className = 'bullet';
-    bulletElement.style.top = position.y;
-    bulletElement.style.left = position.x;
+  const initMissile = (missile, spaceElement) => {
+    const { id, position } = missile.getInfo();
+    const missileElement = document.createElement('div');
 
-    spaceElement.appendChild(bulletElement);
+    missileElement.id = id;
+    missileElement.className = 'missile';
+    missileElement.style.top = position.y;
+    missileElement.style.left = position.x;
+
+    spaceElement.appendChild(missileElement);
   };
 
-  const positionBullet = (bullet) => {
-    const { id, position } = bullet.getInfo();
-    const bulletElement = document.getElementById(id);
-    bulletElement.style.top = position.y;
-    bulletElement.style.left = position.x;
+  const positionMissile = (missile) => {
+    const { id, position } = missile.getInfo();
+    const missileElement = document.getElementById(id);
+
+    missileElement.style.top = position.y;
+    missileElement.style.left = position.x;
   };
 
-  const gameController = (spaceship, bullets, spaceElement, event) => {
+  const gameController = (spaceship, missiles, spaceElement, event) => {
     if (event.code === 'Space') {
-      spaceship.fireBullet();
-      initBullet(bullets.getLastBullet(), spaceElement);
+      spaceship.launchMissile();
+      initMissile(missiles.getLastMissile(), spaceElement);
       return;
     }
     moveSpaceship(spaceship, event);
@@ -145,21 +148,23 @@
 
   const begin = () => {
     const spaceElement = document.getElementById('space');
-    const bullets = new Bullets();
+    const missiles = new Missiles();
     const position = { x: 500, y: 800 };
-    const spaceship = new Spaceship('spaceship-1', position, 10, bullets);
+    const spaceship = new Spaceship('spaceship-1', position, 10, missiles);
+
     initSpaceship(spaceship, spaceElement);
 
     window.addEventListener('keydown', (event) => {
-      gameController(spaceship, bullets, spaceElement, event);
+      gameController(spaceship, missiles, spaceElement, event);
     });
 
     setInterval(() => {
       positionSpaceship(spaceship);
 
-      const firedBullets = bullets.getBullets();
-      firedBullets.forEach((bullet) => bullet.move());
-      firedBullets.forEach((bullet) => positionBullet(bullet));
+      const launchedMissiles = missiles.getMissiles();
+
+      launchedMissiles.forEach((missile) => missile.move());
+      launchedMissiles.forEach((missile) => positionMissile(missile));
     }, 30);
   };
 
