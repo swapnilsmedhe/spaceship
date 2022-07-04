@@ -10,8 +10,10 @@
 }
 
 .bullet {
-  height: 20px;
-  width: 20px;
+  height: 10px;
+  width: 5px;
   background-color: red;
   position: absolute;
+  border-top-left-radius: 50%;
+  border-top-right-radius: 50%;
 }
