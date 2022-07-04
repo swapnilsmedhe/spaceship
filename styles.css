@@ -8,3 +8,10 @@
 .space {
   height: 100%;
 }
+
+.bullet {
+  height: 20px;
+  width: 20px;
+  background-color: red;
+  position: absolute;
+}
