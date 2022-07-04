@@ -21,7 +21,7 @@
     }
   }
 
-  const displaySpaceship = (spaceship, spaceElement) => {
+  const initSpaceship = (spaceship, spaceElement) => {
     const { id, position } = spaceship.getInfo();
 
     const spaceshipElement = document.createElement('div');
@@ -33,7 +33,7 @@
     spaceElement.appendChild(spaceshipElement);
   };
 
-  const updateSpaceship = (spaceship) => {
+  const positionSpaceship = (spaceship) => {
     const { id, position } = spaceship.getInfo();
     const spaceshipElement = document.getElementById(id);
     spaceshipElement.style.top = position.y;
@@ -48,11 +48,11 @@
   const begin = () => {
     const spaceElement = document.getElementById('space');
     const spaceship = new Spaceship('spaceship-1', { x: 50, y: 100 }, 10);
-    displaySpaceship(spaceship, spaceElement);
+    initSpaceship(spaceship, spaceElement);
 
     window.addEventListener('keydown', (event) => {
       moveSpaceship(spaceship, event);
-      updateSpaceship(spaceship);
+      positionSpaceship(spaceship);
     });
   };
 
