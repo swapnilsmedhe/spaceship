@@ -100,25 +100,25 @@
     }
   }
 
-  const initSpaceship = (spaceship, spaceElement) => {
-    const { id, position } = spaceship.getInfo();
+  const initSpaceObject = (spaceObject, className, spaceElement) => {
+    const { id, position } = spaceObject.getInfo();
 
-    const spaceshipElement = document.createElement('div');
+    const spaceObjectElement = document.createElement('div');
 
-    spaceshipElement.id = id;
-    spaceshipElement.className = 'spaceship';
-    spaceshipElement.style.top = position.y;
-    spaceshipElement.style.left = position.x;
+    spaceObjectElement.id = id;
+    spaceObjectElement.className = className;
+    spaceObjectElement.style.top = position.y;
+    spaceObjectElement.style.left = position.x;
 
-    spaceElement.appendChild(spaceshipElement);
+    spaceElement.appendChild(spaceObjectElement);
   };
 
-  const positionSpaceship = (spaceship) => {
-    const { id, position } = spaceship.getInfo();
-    const spaceshipElement = document.getElementById(id);
+  const positionSpaceObject = (spaceObject) => {
+    const { id, position } = spaceObject.getInfo();
+    const spaceObjectElement = document.getElementById(id);
 
-    spaceshipElement.style.top = position.y;
-    spaceshipElement.style.left = position.x;
+    spaceObjectElement.style.top = position.y;
+    spaceObjectElement.style.left = position.x;
   };
 
   const mapCodeToDirection = (code) => {
@@ -137,42 +137,10 @@
     spaceship.move(direction);
   };
 
-  const initMissile = (missile, spaceElement) => {
-    const { id, position } = missile.getInfo();
-    const missileElement = document.createElement('div');
-
-    missileElement.id = id;
-    missileElement.className = 'missile';
-    missileElement.style.top = position.y;
-    missileElement.style.left = position.x;
-
-    spaceElement.appendChild(missileElement);
-  };
-
-  const positionMissile = (missile) => {
-    const { id, position } = missile.getInfo();
-    const missileElement = document.getElementById(id);
-
-    missileElement.style.top = position.y;
-    missileElement.style.left = position.x;
-  };
-
-  const initUFO = (ufo, spaceElement) => {
-    const { id, position } = ufo.getInfo();
-    const ufoElement = document.createElement('div');
-
-    ufoElement.id = id;
-    ufoElement.className = 'ufo';
-    ufoElement.style.top = position.y;
-    ufoElement.style.left = position.x;
-
-    spaceElement.appendChild(ufoElement);
-  };
-
   const gameController = (spaceship, missiles, spaceElement, event) => {
     if (event.code === 'Space') {
       spaceship.launchMissile();
-      initMissile(missiles.getLastMissile(), spaceElement);
+      initSpaceObject(missiles.getLastMissile(), 'missile', spaceElement);
       return;
     }
     moveSpaceship(spaceship, event);
@@ -185,20 +153,23 @@
     const spaceship = new Spaceship('spaceship-1', position, 10, missiles);
     const ufo = new UFO('ufo-1', { x: 500, y: 10 }, 5);
 
-    initUFO(ufo, spaceElement);
-    initSpaceship(spaceship, spaceElement);
+    initSpaceObject(ufo, 'ufo', spaceElement);
+    initSpaceObject(spaceship, 'spaceship', spaceElement);
 
     window.addEventListener('keydown', (event) => {
       gameController(spaceship, missiles, spaceElement, event);
     });
 
     setInterval(() => {
-      positionSpaceship(spaceship);
+      positionSpaceObject(spaceship);
 
       const launchedMissiles = missiles.getMissiles();
 
       launchedMissiles.forEach((missile) => missile.move());
-      launchedMissiles.forEach((missile) => positionMissile(missile));
+      launchedMissiles.forEach((missile) => positionSpaceObject(missile));
+
+      ufo.move();
+      positionSpaceObject(ufo);
     }, 30);
   };
 
