@@ -1,3 +1,7 @@
+body {
+  overflow: hidden;
+}
+
 .spaceship {
   height: 50px;
   width: 50px;

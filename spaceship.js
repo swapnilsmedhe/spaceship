@@ -146,7 +146,7 @@
     moveSpaceship(spaceship, event);
   };
 
-  const begin = () => {
+  const main = () => {
     const spaceElement = document.getElementById('space');
     const missiles = new Missiles();
     const position = { x: 500, y: 800 };
@@ -173,5 +173,5 @@
     }, 30);
   };
 
-  window.onload = begin;
+  window.onload = main;
 })();
