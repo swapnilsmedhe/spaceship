@@ -12,13 +12,12 @@
       this.#missiles = missiles;
     }
 
-    move(direction) {
-      if (direction === 'right') {
-        this.#position.x += this.#displacement;
-      }
-      if (direction === 'left') {
-        this.#position.x -= this.#displacement;
-      }
+    moveLeft() {
+      this.#position.x -= this.#displacement;
+    }
+
+    moveRight() {
+      this.#position.x += this.#displacement;
     }
 
     launchMissile() {
@@ -77,6 +76,10 @@
     getMissiles() {
       return this.#missiles;
     }
+
+    moveAllMissiles() {
+      this.#missiles.forEach((missile) => missile.move());
+    }
   }
 
   class UFO {
@@ -100,6 +103,113 @@
     }
   }
 
+
+  class Game {
+    #spaceshipDetails;
+    #ufoDetails;
+    #spaceship;
+    #missiles;
+    #ufo;
+
+    constructor(spaceshipDetails, ufoDetails) {
+      this.#spaceshipDetails = spaceshipDetails;
+      this.#ufoDetails = ufoDetails;
+      this.#spaceship = null;
+      this.#missiles = null;
+      this.#ufo = null;
+    }
+
+    #initMissiles() {
+      this.#missiles = new Missiles();
+    }
+
+    #initSpaceship() {
+      const { id, position, displacement } = this.#spaceshipDetails;
+      this.#spaceship = new Spaceship(id, position, displacement, this.#missiles);
+    }
+
+    #initUFO() {
+      const { id, position, displacement } = this.#ufoDetails;
+      this.#ufo = new UFO(id, position, displacement);
+    }
+
+    init() {
+      this.#initMissiles();
+      this.#initSpaceship();
+      this.#initUFO();
+    }
+
+    update() {
+      this.#missiles.moveAllMissiles();
+      this.#ufo.move();
+    }
+
+    moveSpaceship(direction) {
+      if (direction === 'right') {
+        this.#spaceship.moveRight();
+      }
+      if (direction === 'left') {
+        this.#spaceship.moveLeft();
+      }
+    }
+
+    launchMissile() {
+      this.#spaceship.launchMissile();
+    }
+
+    getDetails() {
+      return {
+        spaceship: this.#spaceship,
+        missiles: this.#missiles.getMissiles(),
+        ufo: this.#ufo
+      }
+    }
+  }
+
+  class GameController {
+    #game;
+    #spaceElement;
+
+    constructor(game, spaceElement) {
+      this.#game = game;
+      this.#spaceElement = spaceElement;
+    }
+
+    control(code) {
+      if (code === 'ArrowRight') {
+        this.#game.moveSpaceship('right');
+      }
+      if (code === 'ArrowLeft') {
+        this.#game.moveSpaceship('left');
+      }
+      if (code === 'Space') {
+        this.#game.launchMissile();
+      }
+    }
+
+    draw() {
+      const { spaceship, missiles, ufo } = this.#game.getDetails();
+      clearView(spaceship, ...missiles, ufo);
+      initSpaceObject(spaceship, 'spaceship', this.#spaceElement);
+      missiles.forEach((missile) =>
+        initSpaceObject(missile, 'missile', this.#spaceElement));
+
+      initSpaceObject(ufo, 'ufo', this.#spaceElement);
+    }
+  }
+
+
+  const clearView = (...objects) => {
+    objects.forEach(object => {
+      const { id } = object.getInfo();
+      console.log(object);
+      const objectElement = document.getElementById(id);
+      if (objectElement) {
+        objectElement.remove();
+      }
+    })
+  };
+
   const initSpaceObject = (spaceObject, className, spaceElement) => {
     const { id, position } = spaceObject.getInfo();
 
@@ -113,63 +223,30 @@
     spaceElement.appendChild(spaceObjectElement);
   };
 
-  const positionSpaceObject = (spaceObject) => {
-    const { id, position } = spaceObject.getInfo();
-    const spaceObjectElement = document.getElementById(id);
-
-    spaceObjectElement.style.top = position.y;
-    spaceObjectElement.style.left = position.x;
-  };
-
-  const mapCodeToDirection = (code) => {
-    const keyCodes = {
-      'ArrowRight': 'right',
-      'ArrowLeft': 'left'
-    };
-    return keyCodes[code];
-  };
-
-  const moveSpaceship = (spaceship, { code }) => {
-    const direction = mapCodeToDirection(code);
-    if (!direction) {
-      return;
-    }
-    spaceship.move(direction);
-  };
-
-  const gameController = (spaceship, missiles, spaceElement, event) => {
-    if (event.code === 'Space') {
-      spaceship.launchMissile();
-      initSpaceObject(missiles.getLastMissile(), 'missile', spaceElement);
-      return;
-    }
-    moveSpaceship(spaceship, event);
-  };
-
   const main = () => {
     const spaceElement = document.getElementById('space');
-    const missiles = new Missiles();
-    const position = { x: 500, y: 800 };
-    const spaceship = new Spaceship('spaceship-1', position, 10, missiles);
-    const ufo = new UFO('ufo-1', { x: 500, y: 10 }, 5);
 
-    initSpaceObject(ufo, 'ufo', spaceElement);
-    initSpaceObject(spaceship, 'spaceship', spaceElement);
+    const spaceshipDetails = {
+      id: 'spaceship-1', position: { x: 500, y: 800 }, displacement: 10
+    }
+
+    const ufoDetails = {
+      id: 'ufo-1', position: { x: 500, y: 10 }, displacement: 5
+    }
+
+    const game = new Game(spaceshipDetails, ufoDetails);
+    game.init();
+
+    const gameController = new GameController(game, spaceElement);
 
     window.addEventListener('keydown', (event) => {
-      gameController(spaceship, missiles, spaceElement, event);
+      gameController.control(event.code);
+      gameController.draw();
     });
 
     setInterval(() => {
-      positionSpaceObject(spaceship);
-
-      const launchedMissiles = missiles.getMissiles();
-
-      launchedMissiles.forEach((missile) => missile.move());
-      launchedMissiles.forEach((missile) => positionSpaceObject(missile));
-
-      ufo.move();
-      positionSpaceObject(ufo);
+      game.update();
+      gameController.draw();
     }, 30);
   };
 
