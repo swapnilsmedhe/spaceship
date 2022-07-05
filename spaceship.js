@@ -3,13 +3,13 @@
     #id;
     #position;
     #displacement;
-    missiles;
+    #missiles;
 
     constructor(id, position, displacement, missiles) {
       this.#id = id;
       this.#position = position;
       this.#displacement = displacement;
-      this.missiles = missiles;
+      this.#missiles = missiles;
     }
 
     move(direction) {
@@ -23,7 +23,7 @@
 
     launchMissile() {
       const { x, y } = this.#position;
-      this.missiles.addMissile({ x, y });
+      this.#missiles.addMissile({ x, y });
     }
 
     getInfo() {
@@ -44,8 +44,7 @@
     }
 
     move() {
-      this.#position.x += this.#displacement.dx;
-      this.#position.y -= this.#displacement.dy;
+      this.#position.y -= this.#displacement;
     }
 
     getInfo() {
@@ -68,7 +67,7 @@
 
     addMissile(position) {
       const missileId = this.#getMissileId();
-      this.#missiles.push(new Missile(missileId, position, { dx: 0, dy: 5 }));
+      this.#missiles.push(new Missile(missileId, position, 5));
     }
 
     getLastMissile() {
@@ -77,6 +76,27 @@
 
     getMissiles() {
       return this.#missiles;
+    }
+  }
+
+  class UFO {
+    #id;
+    #position;
+    #displacement;
+
+    constructor(id, position, displacement) {
+      this.#id = id;
+      this.#position = position;
+      this.#displacement = displacement;
+    }
+
+    move() {
+      this.#position.y += this.#displacement;
+    }
+
+    getInfo() {
+      const { x, y } = this.#position;
+      return { id: this.#id, position: { x, y } };
     }
   }
 
@@ -137,6 +157,18 @@
     missileElement.style.left = position.x;
   };
 
+  const initUFO = (ufo, spaceElement) => {
+    const { id, position } = ufo.getInfo();
+    const ufoElement = document.createElement('div');
+
+    ufoElement.id = id;
+    ufoElement.className = 'ufo';
+    ufoElement.style.top = position.y;
+    ufoElement.style.left = position.x;
+
+    spaceElement.appendChild(ufoElement);
+  };
+
   const gameController = (spaceship, missiles, spaceElement, event) => {
     if (event.code === 'Space') {
       spaceship.launchMissile();
@@ -151,7 +183,9 @@
     const missiles = new Missiles();
     const position = { x: 500, y: 800 };
     const spaceship = new Spaceship('spaceship-1', position, 10, missiles);
+    const ufo = new UFO('ufo-1', { x: 500, y: 10 }, 5);
 
+    initUFO(ufo, spaceElement);
     initSpaceship(spaceship, spaceElement);
 
     window.addEventListener('keydown', (event) => {

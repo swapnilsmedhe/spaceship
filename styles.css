@@ -17,3 +17,14 @@
   border-top-left-radius: 50%;
   border-top-right-radius: 50%;
 }
+
+.ufo {
+  height: 30px;
+  width: 100px;
+  background-color: grey;
+  position: absolute;
+  border-bottom-left-radius: 70%;
+  border-top-left-radius: 70%;
+  border-bottom-right-radius: 70%;
+  border-top-right-radius: 70%;
+}
